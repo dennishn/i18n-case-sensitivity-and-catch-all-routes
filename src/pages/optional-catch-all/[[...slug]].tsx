@@ -1,15 +1,15 @@
-import { GetStaticProps, InferGetStaticPropsType } from "next";
+import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
 import { BasePageProps } from "@/types";
 
-type HomeProps = BasePageProps;
+type OptionalCatchAllProps = BasePageProps<{ slug?: string | Array<string> }>;
 
-export default function Home(
+export default function OptionalCatchAll(
   props: Readonly<InferGetStaticPropsType<typeof getStaticProps>>,
 ) {
   return (
     <main>
       <p>
-        This is the <code>/pages/index.tsx</code> route
+        This is the <code>/pages/optional-catch-all/[[...slug]].tsx</code> route
       </p>
       <p>The following props was passed from getStaticProps:</p>
       <pre>{JSON.stringify(props, null, 2)}</pre>
@@ -31,11 +31,21 @@ export const getStaticProps = (async ({
       locale,
       draftMode: Boolean(draftMode),
       locales,
-      params: { ...params },
+      params: {
+        ...params,
+        slug: params?.slug ?? [],
+      },
       defaultLocale,
       preview: Boolean(preview),
       revalidateReason,
     },
     revalidate: 60,
   };
-}) satisfies GetStaticProps<HomeProps>;
+}) satisfies GetStaticProps<OptionalCatchAllProps>;
+
+export const getStaticPaths = (async () => {
+  return {
+    paths: [],
+    fallback: "blocking",
+  };
+}) satisfies GetStaticPaths;
